@@ -9,8 +9,8 @@ module.exports = (grunt) ->
         src: ['src/*.jade']
         dest: 'public'
         ext: '.html'
-      # options:
-      #   pretty: true
+      options:
+        pretty: true
 
     sass:
       all:
@@ -28,13 +28,15 @@ module.exports = (grunt) ->
         dest: 'public'
         ext: '.css'
 
-    coffee:
-      all:
-        expand: true
-        flatten: true
-        src: ['src/*.coffee']
-        dest: 'public'
-        ext: '.js'
+    browserify:
+      'public/bundle.js': 'src/main.coffee'
+      options:
+        watch: true
+        transform: ['coffeeify', 'browserify-shim']
+        browserifyOptions:
+          extensions: ['.coffee']
+          fullPaths: false
+          debug: true
 
     watch:
       html:
@@ -43,11 +45,10 @@ module.exports = (grunt) ->
       sass:
         files: ['src/*.sass']
         tasks: ['styles']
-      coffee:
-        files: ['src/*.coffee']
-        tasks: ['coffee']
-      options:
-        livereload: true
+      dist:
+        files: ['public/**/*']
+        options:
+          livereload: true
 
     connect:
       server:
@@ -58,8 +59,8 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks('grunt-contrib-jade')
   grunt.loadNpmTasks('grunt-contrib-sass')
   grunt.loadNpmTasks('grunt-autoprefixer')
-  grunt.loadNpmTasks('grunt-contrib-coffee')
+  grunt.loadNpmTasks('grunt-browserify')
   grunt.loadNpmTasks('grunt-contrib-watch')
   grunt.loadNpmTasks('grunt-contrib-connect')
   grunt.registerTask('styles', ['sass', 'autoprefixer'])
-  grunt.registerTask('default', ['connect', 'jade', 'styles', 'coffee', 'watch'])
+  grunt.registerTask('default', ['connect', 'jade', 'styles', 'browserify', 'watch'])
